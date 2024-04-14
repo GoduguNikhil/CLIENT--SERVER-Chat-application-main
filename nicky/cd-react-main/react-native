@@ -1,0 +1,114 @@
+// App.js
+
+import React, { useState, useEffect } from 'react';
+import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+
+export default function App() {
+  const [time, setTime] = useState(120);
+  const [score, setScore] = useState(0);
+  const [missed, setMissed] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (time > 0) {
+        setTime(prevTime => prevTime - 1);
+      } else {
+        clearInterval(timer);
+        setGameOver(true);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [time]);
+
+  const handlePopBalloon = () => {
+    setScore(prevScore => prevScore + 2);
+  };
+
+  const handleMissedBalloon = () => {
+    setMissed(prevMissed => prevMissed + 1);
+    setScore(prevScore => prevScore - 1);
+  };
+
+  const handleRestart = () => {
+    setTime(120);
+    setScore(0);
+    setMissed(0);
+    setGameOver(false);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.timer}>{Math.floor(time / 60)}:{(time % 60).toLocaleString('en-US', {minimumIntegerDigits: 2})}</Text>
+      <View style={styles.scoreContainer}>
+        <Text style={styles.score}>Balloons Popped: {score}</Text>
+        <Text style={styles.score}>Balloons Missed: {missed}</Text>
+      </View>
+      {!gameOver ? (
+        <TouchableOpacity style={styles.balloon} onPress={handlePopBalloon}>
+          <Text style={styles.balloonText}>🎈</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.gameOverContainer}>
+          <Text style={styles.gameOverText}>Game Over!</Text>
+          <Text style={styles.finalScore}>Final Score: {score}</Text>
+          <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
+            <Text style={styles.restartText}>Restart</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  timer: {
+    fontSize: 40,
+    marginBottom: 20,
+  },
+  scoreContainer: {
+    marginBottom: 20,
+  },
+  score: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  balloon: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'skyblue',
+    borderRadius: 40,
+  },
+  balloonText: {
+    fontSize: 30,
+  },
+  gameOverContainer: {
+    alignItems: 'center',
+  },
+  gameOverText: {
+    fontSize: 30,
+    marginBottom: 20,
+  },
+  finalScore: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  restartButton: {
+    backgroundColor: 'lightgreen',
+    padding: 10,
+    borderRadius: 5,
+  },
+  restartText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
